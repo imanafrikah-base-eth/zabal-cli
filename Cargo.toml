@@ -6,6 +6,10 @@ description = "Generate ZABAL hackathon submission documents from your Git commi
 repository = "https://github.com/imanafrikah-base-eth/zabal-cli"
 license = "MIT"
 
+[lib]
+name = "zabal_cli"
+path = "src/lib.rs"
+
 [[bin]]
 name = "zabal"
 path = "src/main.rs"
@@ -16,3 +20,6 @@ chrono = "0.4"
 git2 = "0.18"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3"

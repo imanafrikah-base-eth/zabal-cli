@@ -1,6 +1,10 @@
 /target
 **/*.rs.bk
 
+# Generated submissions
+zabal-submission.md
+zabal-submission.json
+
 # Editor / OS
 .vscode/
 .idea/
