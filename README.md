@@ -7,7 +7,10 @@ made and turns them into a submission document.
 
 ## Install
 
-Requires a Rust toolchain (`rustup`, which provides `cargo`).
+Requires a Rust toolchain (`rustup`, which provides `cargo`) and a C compiler, since `git2`
+builds libgit2 from source. On Linux and macOS the system compiler is enough. On Windows use
+either the MSVC build tools or a MinGW-w64 toolchain with the `x86_64-pc-windows-gnu` target;
+both are known to work.
 
 ```bash
 git clone https://github.com/imanafrikah-base-eth/zabal-cli.git
@@ -88,7 +91,8 @@ for feeding into other tooling.
 ## Project status
 
 Week 1 MVP is in place: scanning, both output formats, the tracker, and an integration test
-suite all work end to end.
+suite all work end to end. Verified on Rust 1.97.1 (`x86_64-pc-windows-gnu`): `cargo build`,
+`cargo test` (11 passing), `cargo clippy` and `cargo fmt --check` are all clean.
 
 | Module | Responsibility |
 | --- | --- |

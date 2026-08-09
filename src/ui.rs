@@ -78,7 +78,10 @@ pub fn render_preview(commits: &[CommitInfo], days: u64, handle: Option<&str>) -
 
     if commits.is_empty() {
         let _ = writeln!(out, "No commits found in this window.");
-        let _ = writeln!(out, "Try a wider window, for example: zabal preview --days 30");
+        let _ = writeln!(
+            out,
+            "Try a wider window, for example: zabal preview --days 30"
+        );
         return out;
     }
 
@@ -111,7 +114,10 @@ pub fn render_preview(commits: &[CommitInfo], days: u64, handle: Option<&str>) -
     }
 
     let _ = writeln!(out, "\n{}", "-".repeat(60));
-    let _ = writeln!(out, "Nothing was written to disk. Run `zabal submit` to generate the document.");
+    let _ = writeln!(
+        out,
+        "Nothing was written to disk. Run `zabal submit` to generate the document."
+    );
     out
 }
 

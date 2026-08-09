@@ -4,6 +4,7 @@
 use chrono::{DateTime, TimeZone, Utc};
 use git2::{Commit, Repository, Sort};
 use serde::Serialize;
+use std::cmp::Reverse;
 use std::error::Error;
 use std::path::Path;
 
@@ -58,7 +59,7 @@ pub fn scan_commits(repo_path: &Path, days: u64) -> Result<Vec<CommitInfo>, Box<
         commits.push(describe(&repo, &commit)?);
     }
 
-    commits.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+    commits.sort_by_key(|c| Reverse(c.timestamp));
     Ok(commits)
 }
 
@@ -77,7 +78,10 @@ fn describe(repo: &Repository, commit: &Commit) -> Result<CommitInfo, Box<dyn Er
     Ok(CommitInfo {
         short_id: id.chars().take(7).collect(),
         id,
-        summary: commit.summary().unwrap_or("(no commit message)").to_string(),
+        summary: commit
+            .summary()
+            .unwrap_or("(no commit message)")
+            .to_string(),
         body: commit
             .body()
             .map(|b| b.trim().to_string())

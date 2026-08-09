@@ -63,8 +63,13 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .unwrap_or_else(|| ui::project_name(&root));
 
             let scanned = commits::scan_commits(&root, days)?;
-            let document =
-                generator::generate_submission(&scanned, format, handle, Some(project.as_str()), days)?;
+            let document = generator::generate_submission(
+                &scanned,
+                format,
+                handle,
+                Some(project.as_str()),
+                days,
+            )?;
 
             let path = output
                 .unwrap_or_else(|| root.join(format!("zabal-submission.{}", format.extension())));

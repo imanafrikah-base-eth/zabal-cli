@@ -69,7 +69,7 @@ fn missing_path_is_an_error() {
 fn commits_outside_the_window_are_excluded() {
     let (dir, repo) = new_repo();
     commit_file(&repo, "old.txt", "old\n", "ancient work", now() - 30 * DAY);
-    commit_file(&repo, "new.txt", "new\n", "recent work", now() - 1 * DAY);
+    commit_file(&repo, "new.txt", "new\n", "recent work", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
     assert_eq!(found.len(), 1);
@@ -84,7 +84,7 @@ fn commits_are_returned_newest_first() {
     let (dir, repo) = new_repo();
     commit_file(&repo, "a.txt", "a\n", "first", now() - 3 * DAY);
     commit_file(&repo, "b.txt", "b\n", "second", now() - 2 * DAY);
-    commit_file(&repo, "c.txt", "c\n", "third", now() - 1 * DAY);
+    commit_file(&repo, "c.txt", "c\n", "third", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
     let summaries: Vec<&str> = found.iter().map(|c| c.summary.as_str()).collect();
@@ -95,8 +95,14 @@ fn commits_are_returned_newest_first() {
 #[test]
 fn diff_stats_are_populated() {
     let (dir, repo) = new_repo();
-    commit_file(&repo, "a.txt", "one\ntwo\nthree\n", "add three lines", now() - 2 * DAY);
-    commit_file(&repo, "a.txt", "one\n", "cut back to one line", now() - 1 * DAY);
+    commit_file(
+        &repo,
+        "a.txt",
+        "one\ntwo\nthree\n",
+        "add three lines",
+        now() - 2 * DAY,
+    );
+    commit_file(&repo, "a.txt", "one\n", "cut back to one line", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
     assert_eq!(found.len(), 2);
@@ -116,7 +122,7 @@ fn diff_stats_are_populated() {
 #[test]
 fn scanning_works_from_a_subdirectory() {
     let (dir, repo) = new_repo();
-    commit_file(&repo, "a.txt", "a\n", "only commit", now() - 1 * DAY);
+    commit_file(&repo, "a.txt", "a\n", "only commit", now() - DAY);
 
     let nested = dir.path().join("src").join("deep");
     fs::create_dir_all(&nested).expect("create nested dirs");
@@ -129,7 +135,7 @@ fn scanning_works_from_a_subdirectory() {
 fn totals_aggregate_across_commits() {
     let (dir, repo) = new_repo();
     commit_file(&repo, "a.txt", "one\ntwo\n", "add a", now() - 2 * DAY);
-    commit_file(&repo, "b.txt", "three\n", "add b", now() - 1 * DAY);
+    commit_file(&repo, "b.txt", "three\n", "add b", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
     let t = totals(&found);
@@ -144,7 +150,7 @@ fn totals_aggregate_across_commits() {
 fn markdown_submission_mentions_every_commit() {
     let (dir, repo) = new_repo();
     commit_file(&repo, "a.txt", "a\n", "wire up the parser", now() - 2 * DAY);
-    commit_file(&repo, "b.txt", "b\n", "wire up the generator", now() - 1 * DAY);
+    commit_file(&repo, "b.txt", "b\n", "wire up the generator", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
     let doc = generate_submission(&found, Format::Markdown, Some("@tester"), Some("demo"), 7)
@@ -160,12 +166,14 @@ fn markdown_submission_mentions_every_commit() {
 #[test]
 fn json_submission_is_valid_json() {
     let (dir, repo) = new_repo();
-    commit_file(&repo, "a.txt", "a\n", "only commit", now() - 1 * DAY);
+    commit_file(&repo, "a.txt", "a\n", "only commit", now() - DAY);
 
     let found = scan_commits(dir.path(), 7).expect("scan");
-    let doc = generate_submission(&found, Format::Json, None, Some("demo"), 7).expect("render json");
+    let doc =
+        generate_submission(&found, Format::Json, None, Some("demo"), 7).expect("render json");
 
-    let parsed: serde_json::Value = serde_json::from_str(&doc).expect("output should parse as JSON");
+    let parsed: serde_json::Value =
+        serde_json::from_str(&doc).expect("output should parse as JSON");
     assert_eq!(parsed["totals"]["commits"], 1);
     assert_eq!(parsed["window_days"], 7);
     assert_eq!(parsed["commits"][0]["summary"], "only commit");
